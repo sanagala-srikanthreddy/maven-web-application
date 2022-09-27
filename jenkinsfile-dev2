@@ -5,7 +5,7 @@ def mavenhome = tool name:"3.8.6"
 properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
 stage('checkout the code')
 {
-git branch: 'test', credentialsId: '8e6fb1a2-8f95-43be-9a85-9dfcc000d0cf', url: 'https://github.com/sanagala-srikanthreddy/maven-web-application.git'
+git branch: 'development', credentialsId: '8e6fb1a2-8f95-43be-9a85-9dfcc000d0cf', url: 'https://github.com/sanagala-srikanthreddy/maven-web-application.git'
 }
 
 stage('build the artifact')
