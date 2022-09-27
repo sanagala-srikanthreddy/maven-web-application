@@ -1,0 +1,39 @@
+
+node('test')
+{
+def mavenhome = tool name:"3.8.6" 
+properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
+stage('checkout the code')
+{
+git branch: 'test', credentialsId: '8e6fb1a2-8f95-43be-9a85-9dfcc000d0cf', url: 'https://github.com/sanagala-srikanthreddy/maven-web-application.git'
+}
+
+stage('build the artifact')
+{
+sh "${mavenhome}/bin/mvn clean package"
+}
+
+stage('execute sonarqube report')
+{
+sh "${mavenhome}/bin/mvn sonar:sonar"
+}
+
+stage('upload build artifact into arifact repo')
+{
+sh "${mavenhome}/bin/mvn clean deploy"
+}
+
+stage('deploy artifact to a tomcat server')
+{
+sshagent(['b63cfbad-0101-449f-ae01-542d7a785d4c']) {
+scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.232.133.186:/opt/apache-tomcat-9.0.65/webapps
+}
+}
+
+stage('sending email about build status')
+{
+emailext body: '''regards
+sanagala srikanth reddy
+8179677493''', subject: 'build status', to: 'sanagala96@gmail.com'
+}
+}
